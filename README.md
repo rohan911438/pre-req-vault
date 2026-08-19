@@ -56,3 +56,42 @@ populated with the GitHub username during that same transaction.
 Note: registration is one-per-wallet on the registration program's side —
 re-running `withdraw` against an already-registered wallet will fail on the
 CPI step, which is expected behavior, not a bug.
+
+### Test run
+
+All 4 tests passed:
+
+```
+✔ Initialize the vault (2077ms)
+✔ Deposit 1 Sol in to the vault (1338ms)
+✔ Withdraw 0.5 Sol from the vault (1099ms)
+✔ Close the vault and withdraw all the funds (1486ms)
+4 passing (6s)
+```
+
+### On-chain proof
+
+Withdraw transaction on devnet (verified directly against the devnet RPC,
+not just the explorer UI):
+
+```
+5ZaBdAMmpN9Xw78pe4bgmXgjas1HeiSWpqcCNBnS7mYzMa1aBc7pQc6hYedK2ezyE4Q66SCraLXiTCKS7VrKLEa9
+```
+
+https://explorer.solana.com/tx/5ZaBdAMmpN9Xw78pe4bgmXgjas1HeiSWpqcCNBnS7mYzMa1aBc7pQc6hYedK2ezyE4Q66SCraLXiTCKS7VrKLEa9?cluster=devnet
+
+The transaction's instruction logs show the CPI succeeding end to end:
+
+```
+Program 3kbcxQyHtEiU4du5v7gqi9trvT1LFEq6YnemQCQeJ3ca invoke [1]
+Program log: Instruction: Withdraw
+Program TRBZyQHB3m68FGeVsqTK39Wm4xejadjVhP5MAZaKWDM invoke [2]
+Program log: Instruction: Initialize
+Program TRBZyQHB3m68FGeVsqTK39Wm4xejadjVhP5MAZaKWDM success
+Program 3kbcxQyHtEiU4du5v7gqi9trvT1LFEq6YnemQCQeJ3ca success
+```
+
+The resulting `ApplicationAccount` PDA (`HEBmtdS3bwCug617XYidHtYGwWMtg69eLVz4MhX3sKA4`,
+owned by the registration program) was fetched from devnet and its raw account
+data decodes to the GitHub username `rohan911438`, confirming the registration
+was recorded on-chain by this transaction.
